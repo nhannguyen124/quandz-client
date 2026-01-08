@@ -1,8 +1,8 @@
 {
   "required": false,
-  "package": "meteordevelopment.meteorclient.mixin.indigo",
+  "package": "quandzdev.quandzclient.mixin.indigo",
   "compatibilityLevel": "JAVA_21",
-  "plugin": "meteordevelopment.meteorclient.MixinPlugin",
+  "plugin": "quandzdev.quandzclient.MixinPlugin",
   "client": [
     "AbstractTerrainRenderContextMixin",
     "BlockRenderInfoMixin"
