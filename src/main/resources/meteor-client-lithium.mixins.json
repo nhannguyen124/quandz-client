@@ -1,8 +1,8 @@
 {
   "required": false,
-  "package": "meteordevelopment.meteorclient.mixin.lithium",
+  "package": "quandzdev.quandzclient.mixin.lithium",
   "compatibilityLevel": "JAVA_21",
-  "plugin": "meteordevelopment.meteorclient.MixinPlugin",
+  "plugin": "quandzdev.quandzclient.MixinPlugin",
   "client": [
     "ChunkAwareBlockCollisionSweeperMixin",
     "LithiumEntityCollisionsMixin"
