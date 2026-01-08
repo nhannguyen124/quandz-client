@@ -9,4 +9,5 @@ pluginManagement {
     }
 }
 
-rootProject.name = "meteor-client"
+rootProject.name = "quandz-client"
+
