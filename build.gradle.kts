@@ -52,7 +52,6 @@ val modInclude: Configuration by configurations.creating
 val jij: Configuration by configurations.creating
 
 configurations {
-    // include mods
     modImplementation.configure {
         extendsFrom(modInclude)
     }
@@ -60,7 +59,6 @@ configurations {
         extendsFrom(modInclude)
     }
 
-    // include libraries (jar-in-jar)
     implementation.configure {
         extendsFrom(jij)
     }
@@ -72,7 +70,6 @@ configurations {
 sourceSets.create("launcher")
 
 dependencies {
-    // Fabric
     minecraft(libs.minecraft)
     mappings(variantOf(libs.yarn) { classifier("v2") })
     modImplementation(libs.fabric.loader)
@@ -81,7 +78,6 @@ dependencies {
     modInclude(fabricApi.module("fabric-api-base", fapiVersion))
     modInclude(fabricApi.module("fabric-resource-loader-v1", fapiVersion))
 
-    // Compat fixes
     modCompileOnly(fabricApi.module("fabric-renderer-indigo", fapiVersion))
     modCompileOnly(libs.sodium) { isTransitive = false }
     modCompileOnly(libs.lithium) { isTransitive = false }
@@ -92,7 +88,6 @@ dependencies {
     modCompileOnly(libs.baritone)
     modCompileOnly(libs.modmenu)
 
-    // Libraries (JAR-in-JAR)
     jij(libs.orbit)
     jij(libs.starscript)
     jij(libs.discord.ipc)
@@ -104,36 +99,22 @@ dependencies {
 
 sourceSets {
     val launcher = getByName("launcher")
-
-    launcher.apply {
-        java {
-            srcDir("src/launcher/java")
-        }
-    }
+    launcher.java.srcDir("src/launcher/java")
 }
 
-// Handle transitive dependencies for jar-in-jar
-// Based on implementation from BaseProject by FlorianMichael/EnZaXD
-// Source: https://github.com/FlorianMichael/BaseProject/blob/main/src/main/kotlin/de/florianmichael/baseproject/Fabric.kt
-// Licensed under Apache License 2.0
 afterEvaluate {
     val jijConfig = configurations.findByName("jij") ?: return@afterEvaluate
 
-    // Dependencies to exclude from jar-in-jar
     val excluded = setOf(
-        "org.slf4j",    // Logging provided by Minecraft
-        "jsr305"        // Compile time annotations only
+        "org.slf4j",
+        "jsr305"
     )
 
     jijConfig.incoming.resolutionResult.allDependencies.forEach { dep ->
         val requested = dep.requested.displayName
-
         if (excluded.any { requested.contains(it) }) return@forEach
 
-        val compileOnlyDep = dependencies.create(requested) {
-            isTransitive = false
-        }
-
+        val compileOnlyDep = dependencies.create(requested) { isTransitive = false }
         val implDep = dependencies.create(compileOnlyDep)
 
         dependencies.add("compileOnlyApi", compileOnlyDep)
@@ -143,7 +124,7 @@ afterEvaluate {
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/meteor-client.accesswidener")
+    accessWidenerPath = file("src/main/resources/quandz-client.accesswidener")
 }
 
 tasks {
@@ -165,7 +146,6 @@ tasks {
         }
     }
 
-    // Compile launcher with Java 8 for backwards compatibility
     getByName<JavaCompile>("compileLauncherJava") {
         sourceCompatibility = JavaVersion.VERSION_1_8.toString()
         targetCompatibility = JavaVersion.VERSION_1_8.toString()
@@ -173,74 +153,10 @@ tasks {
     }
 
     jar {
-        inputs.property("archivesName", project.base.archivesName.get())
-
         from("LICENSE") {
-            rename { "${it}_${inputs.properties["archivesName"]}" }
+            rename { "${it}_${project.base.archivesName.get()}" }
         }
 
-        // Include launcher classes
         val launcher = sourceSets.getByName("launcher")
         from(launcher.output.classesDirs)
-        from(launcher.output.resourcesDir)
-
-        manifest {
-            attributes["Main-Class"] = "meteordevelopment.meteorclient.Main"
-        }
-    }
-
-    java {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-
-        if (System.getenv("CI")?.toBoolean() == true) {
-            withSourcesJar()
-            withJavadocJar()
-        }
-    }
-
-    withType<JavaCompile> {
-        options.compilerArgs.add("-Xlint:deprecation")
-        options.compilerArgs.add("-Xlint:unchecked")
-    }
-
-    javadoc {
-        with(options as StandardJavadocDocletOptions) {
-            addStringOption("Xdoclint:none", "-quiet")
-            addStringOption("encoding", "UTF-8")
-            addStringOption("charSet", "UTF-8")
-        }
-    }
-
-    build {
-        if (System.getenv("CI")?.toBoolean() == true) {
-            dependsOn("javadocJar")
-        }
-    }
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-            artifactId = "meteor-client"
-
-            version = libs.versions.minecraft.get() + "-SNAPSHOT"
-        }
-    }
-
-    repositories {
-        maven("https://maven.meteordev.org/snapshots") {
-            name = "meteor-maven"
-
-            credentials {
-                username = System.getenv("MAVEN_METEOR_ALIAS")
-                password = System.getenv("MAVEN_METEOR_TOKEN")
-            }
-
-            authentication {
-                create<BasicAuthentication>("basic")
-            }
-        }
-    }
-}
+        from(launcher.out
