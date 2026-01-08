@@ -1,8 +1,8 @@
 {
   "required": true,
-  "package": "meteordevelopment.meteorclient.mixin",
+  "package": "quandzdev.quandzclient.mixin",
   "compatibilityLevel": "JAVA_21",
-  "plugin": "meteordevelopment.meteorclient.MixinPlugin",
+  "plugin": "quandzdev.quandzclient.MixinPlugin",
   "client": [
     "AbstractBlockAccessor",
     "AbstractBlockMixin",
