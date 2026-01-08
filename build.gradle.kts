@@ -159,4 +159,25 @@ tasks {
 
         val launcher = sourceSets.getByName("launcher")
         from(launcher.output.classesDirs)
-        from(launcher.out
+        from(launcher.output.resourcesDir)
+
+        manifest {
+            attributes["Main-Class"] = "me.quandz.client.Main"
+        }
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            artifactId = "quandz-client"
+            version = libs.versions.minecraft.get() + "-SNAPSHOT"
+        }
+    }
+}
