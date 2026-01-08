@@ -1,8 +1,8 @@
 {
   "required": false,
-  "package": "meteordevelopment.meteorclient.mixin.viafabricplus",
+  "package": "quandzdev.quandzclient.mixin.viafabricplus",
   "compatibilityLevel": "JAVA_21",
-  "plugin": "meteordevelopment.meteorclient.MixinPlugin",
+  "plugin": "quandzdev.quandzclient.MixinPlugin",
   "client": [
     "GeneralSettingsMixin"
   ],
